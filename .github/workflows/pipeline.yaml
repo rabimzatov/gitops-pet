@@ -1,0 +1,29 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and Push Docker Image
+        run: |
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t <dockerhub-username>/nginx-sample:latest .
+          docker push <dockerhub-username>/nginx-sample:latest
+
+      - name: Update Manifests
+        run: |
+          sed -i "s|nginx:.*|<dockerhub-username>/nginx-sample:latest|" kustomize/base/deployment.yaml
+          git add .
+          git commit -m "Updated image in manifest"
+          git push origin main
