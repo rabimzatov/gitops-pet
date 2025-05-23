@@ -18,12 +18,12 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -t <dockerhub-username>/nginx-sample:latest .
-          docker push <dockerhub-username>/nginx-sample:latest
+          docker build -t rabimzatov/nginx-sample:latest .
+          docker push rabimzatov/nginx-sample:latest
 
       - name: Update Manifests
         run: |
-          sed -i "s|nginx:.*|<dockerhub-username>/nginx-sample:latest|" kustomize/base/deployment.yaml
+          sed -i "s|nginx:.*|rabimzatov/nginx-sample:latest|" kustomize/base/deployment.yaml
           git add .
           git commit -m "Updated image in manifest"
           git push origin main
